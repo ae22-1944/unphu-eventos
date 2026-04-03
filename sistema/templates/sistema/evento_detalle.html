@@ -1,4 +1,5 @@
 {% extends "sistema/base.html" %}
+{% load static %}
 
 {% block title %}{{ evento.titulo }} — UNPHU Eventos{% endblock %}
 
@@ -25,11 +26,16 @@
       {% if evento.imagen %}
         <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="w-full rounded-xl mb-6 object-cover max-h-72" />
       {% else %}
-        <div class="w-full rounded-xl mb-6 h-48 flex items-center justify-center
-          {% if evento.tipo == 'TESIS' %}bg-gradient-to-r from-purple-600 to-purple-800
-          {% elif evento.tipo == 'ACADEMICA' %}bg-gradient-to-r from-blue-600 to-blue-800
-          {% else %}bg-gradient-to-r from-unphu to-unphu-dark{% endif %}">
-          <span class="text-white text-opacity-80 text-5xl font-bold opacity-30">UNPHU</span>
+        <div class="relative w-full rounded-xl mb-6 h-48 overflow-hidden">
+          <img src="{% static 'unphu-2020-biblioteca.webp' %}" alt="UNPHU"
+            class="w-full h-full object-cover" />
+          <div class="absolute inset-0
+            {% if evento.tipo == 'TESIS' %}bg-purple-800
+            {% elif evento.tipo == 'ACADEMICA' %}bg-blue-800
+            {% else %}bg-unphu{% endif %} bg-opacity-70 flex items-center justify-center">
+            <img src="{% static 'unphu-logo-completo_no-bg.png' %}" alt="UNPHU"
+              class="h-16 brightness-0 invert opacity-70" />
+          </div>
         </div>
       {% endif %}
 
@@ -72,7 +78,18 @@
             </dt>
             <dd>
               <span class="block font-medium text-gray-700">{{ evento.fecha_evento|date:"l d \d\e F \d\e Y" }}</span>
-              <span class="text-gray-500">{{ evento.fecha_evento|time:"g:i A" }}</span>
+              <span class="text-gray-500">
+                {{ evento.fecha_evento|time:"g:i A" }}
+                {% if evento.fecha_fin %} – {{ evento.fecha_fin|time:"g:i A" }}{% endif %}
+              </span>
+              {% if evento.fecha_fin %}
+                <span class="block text-xs text-gray-400 mt-0.5">
+                  Duración aprox.
+                  {% with inicio=evento.fecha_evento fin=evento.fecha_fin %}
+                    {% comment %}Mostrar duración simplificada{% endcomment %}
+                  {% endwith %}
+                </span>
+              {% endif %}
             </dd>
           </div>
 
@@ -89,7 +106,9 @@
             </dt>
             <dd>
               <span class="block text-gray-700">{{ evento.escuela.nombre }}</span>
-              <span class="text-gray-500 text-xs">{{ evento.escuela.facultad.nombre }}</span>
+              {% if evento.escuela.facultad %}
+                <span class="text-gray-500 text-xs">{{ evento.escuela.facultad.nombre }}</span>
+              {% endif %}
             </dd>
           </div>
 

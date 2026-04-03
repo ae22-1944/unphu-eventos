@@ -81,6 +81,15 @@
         </div>
 
         <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.fecha_fin.label }}</label>
+          <input type="datetime-local" name="fecha_fin"
+            value="{{ form.fecha_fin.value|default:'' }}"
+            class="w-full border {% if form.fecha_fin.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu" />
+          {% if form.fecha_fin.errors %}<p class="text-red-500 text-xs mt-1">{{ form.fecha_fin.errors.0 }}</p>{% endif %}
+          <p class="text-gray-400 text-xs mt-1">Opcional — indica cuándo termina el evento</p>
+        </div>
+
+        <div class="md:col-span-2">
           <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.lugar.label }} <span class="text-red-500">*</span></label>
           <input type="text" name="lugar" value="{{ form.lugar.value|default:'' }}"
             class="w-full border {% if form.lugar.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu"

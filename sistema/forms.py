@@ -40,7 +40,7 @@ class RegistroForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["escuela"].queryset = Escuela.objects.select_related("facultad").order_by(
-            "facultad__nombre", "nombre"
+            "nombre"
         )
         self.fields["escuela"].required = False
         self.fields["semestre_actual"].required = False
@@ -67,7 +67,7 @@ class PerfilForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["escuela"].queryset = Escuela.objects.select_related("facultad").order_by(
-            "facultad__nombre", "nombre"
+            "nombre"
         )
         self.fields["escuela"].required = False
         self.fields["semestre_actual"].required = False
@@ -83,6 +83,7 @@ class EventoForm(forms.ModelForm):
             "tipo",
             "descripcion",
             "fecha_evento",
+            "fecha_fin",
             "lugar",
             "escuela",
             "cupo_maximo",
@@ -94,7 +95,8 @@ class EventoForm(forms.ModelForm):
             "titulo": "Título",
             "tipo": "Tipo de evento",
             "descripcion": "Descripción",
-            "fecha_evento": "Fecha y hora",
+            "fecha_evento": "Fecha y hora de inicio",
+            "fecha_fin": "Fecha y hora de finalización",
             "lugar": "Lugar / Edificio",
             "escuela": "Escuela organizadora",
             "cupo_maximo": "Cupo máximo (0 = sin límite)",
@@ -106,6 +108,9 @@ class EventoForm(forms.ModelForm):
             "fecha_evento": forms.DateTimeInput(
                 attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
             ),
+            "fecha_fin": forms.DateTimeInput(
+                attrs={"type": "datetime-local"}, format="%Y-%m-%dT%H:%M"
+            ),
             "descripcion": forms.Textarea(attrs={"rows": 5}),
             "semestre_min": forms.NumberInput(attrs={"min": 1, "max": 10}),
             "semestre_max": forms.NumberInput(attrs={"min": 1, "max": 10}),
@@ -114,25 +119,38 @@ class EventoForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields["escuela"].queryset = Escuela.objects.select_related("facultad").order_by(
-            "facultad__nombre", "nombre"
+            "nombre"
         )
         self.fields["semestre_min"].required = False
         self.fields["semestre_max"].required = False
+        self.fields["fecha_fin"].required = False
         self.fields["imagen"].required = False
-        # Pre-populate datetime widget correctly
-        if self.instance and self.instance.pk and self.instance.fecha_evento:
-            self.initial["fecha_evento"] = self.instance.fecha_evento.strftime(
-                "%Y-%m-%dT%H:%M"
-            )
+        # Pre-populate datetime widgets correctly
+        if self.instance and self.instance.pk:
+            if self.instance.fecha_evento:
+                self.initial["fecha_evento"] = self.instance.fecha_evento.strftime(
+                    "%Y-%m-%dT%H:%M"
+                )
+            if self.instance.fecha_fin:
+                self.initial["fecha_fin"] = self.instance.fecha_fin.strftime(
+                    "%Y-%m-%dT%H:%M"
+                )
 
     def clean(self):
         cleaned = super().clean()
-        fecha = cleaned.get("fecha_evento")
+        fecha_inicio = cleaned.get("fecha_evento")
+        fecha_fin = cleaned.get("fecha_fin")
         sem_min = cleaned.get("semestre_min")
         sem_max = cleaned.get("semestre_max")
 
-        if fecha and fecha <= timezone.now():
-            self.add_error("fecha_evento", "La fecha del evento debe ser en el futuro.")
+        if fecha_inicio and fecha_inicio <= timezone.now():
+            self.add_error("fecha_evento", "La fecha de inicio debe ser en el futuro.")
+
+        if fecha_inicio and fecha_fin and fecha_fin <= fecha_inicio:
+            self.add_error(
+                "fecha_fin",
+                "La fecha de finalización debe ser posterior a la fecha de inicio.",
+            )
 
         if sem_min and sem_max and sem_min > sem_max:
             self.add_error(

@@ -43,6 +43,7 @@ class EventoAdmin(admin.ModelAdmin):
         "titulo",
         "tipo",
         "fecha_evento",
+        "fecha_fin",
         "escuela",
         "lugar",
         "publicado_por",
@@ -50,7 +51,7 @@ class EventoAdmin(admin.ModelAdmin):
         "cupos_disponibles_display",
         "fecha_creacion",
     ]
-    list_filter = ["tipo", "escuela__facultad", "escuela"]
+    list_filter = ["tipo", "escuela", "escuela__facultad"]
     search_fields = ["titulo", "descripcion", "lugar"]
     readonly_fields = ["publicado_por", "fecha_creacion", "fecha_modificacion"]
 

@@ -98,9 +98,9 @@ def home(request):
     if lugar:
         qs = qs.filter(lugar__icontains=lugar)
     if fecha_desde:
-        qs = qs.filter(fecha_evento__date__gte=fecha_desde)
+        qs = qs.filter(fecha_evento__gte=fecha_desde)
     if fecha_hasta:
-        qs = qs.filter(fecha_evento__date__lte=fecha_hasta)
+        qs = qs.filter(fecha_evento__lte=fecha_hasta)
 
     eventos = list(qs)
 

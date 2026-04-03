@@ -1,14 +1,22 @@
 {% extends "sistema/base.html" %}
+{% load static %}
 
 {% block title %}Eventos y Avisos Académicos — UNPHU{% endblock %}
 
 {% block content %}
 
-<!-- Hero -->
-<div class="bg-unphu text-white py-10 px-4">
-  <div class="max-w-7xl mx-auto">
-    <h1 class="text-3xl md:text-4xl font-bold mb-2">Eventos y Avisos Académicos</h1>
-    <p class="text-green-200 text-lg">Mantente informado sobre las actividades de la UNPHU</p>
+<!-- Hero con imagen del auditorio -->
+<div class="relative text-white overflow-hidden" style="min-height: 220px;">
+  <img src="{% static 'unphu-auditorio.jpg' %}" alt="Auditorio UNPHU"
+    class="absolute inset-0 w-full h-full object-cover object-center" />
+  <div class="absolute inset-0 bg-unphu bg-opacity-75"></div>
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 flex items-end gap-5">
+    <img src="{% static 'unphu-logo-completo_no-bg.png' %}" alt="UNPHU"
+      class="h-20 md:h-24 brightness-0 invert opacity-90 hidden sm:block flex-shrink-0" />
+    <div>
+      <h1 class="text-3xl md:text-4xl font-bold leading-tight">Eventos y Avisos Académicos</h1>
+      <p class="text-green-100 text-lg mt-1">Mantente informado sobre las actividades de la UNPHU</p>
+    </div>
   </div>
 </div>
 
@@ -17,7 +25,7 @@
 
     <!-- Sidebar de filtros -->
     <aside class="lg:w-72 flex-shrink-0">
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 lg:sticky lg:top-24">
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 lg:sticky lg:top-20">
         <h2 class="font-semibold text-gray-800 mb-4 flex items-center gap-2">
           <svg class="w-5 h-5 text-unphu" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/></svg>
           Filtrar eventos
@@ -39,7 +47,7 @@
           <!-- Facultad -->
           <div>
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Facultad</label>
-            <select name="facultad" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unphu" id="id_facultad_filter">
+            <select name="facultad" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unphu">
               <option value="">Todas</option>
               {% for fac in facultades %}
                 <option value="{{ fac.id }}" {% if filtros.facultad == fac.id|stringformat:"s" %}selected{% endif %}>{{ fac.nombre }}</option>
@@ -65,15 +73,17 @@
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unphu" />
           </div>
 
-          <!-- Fechas -->
+          <!-- Fecha y hora desde -->
           <div>
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Desde</label>
-            <input type="date" name="fecha_desde" value="{{ filtros.fecha_desde }}"
+            <input type="datetime-local" name="fecha_desde" value="{{ filtros.fecha_desde }}"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unphu" />
           </div>
+
+          <!-- Fecha y hora hasta -->
           <div>
             <label class="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">Hasta</label>
-            <input type="date" name="fecha_hasta" value="{{ filtros.fecha_hasta }}"
+            <input type="datetime-local" name="fecha_hasta" value="{{ filtros.fecha_hasta }}"
               class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unphu" />
           </div>
 

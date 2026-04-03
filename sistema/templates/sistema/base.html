@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -21,9 +22,6 @@
       }
     }
   </script>
-  <style>
-    [x-cloak] { display: none !important; }
-  </style>
   {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
@@ -34,14 +32,12 @@
       <div class="flex items-center justify-between h-16">
 
         <!-- Logo -->
-        <a href="{% url 'home' %}" class="flex items-center gap-2 font-bold text-lg hover:text-unphu-gold transition-colors">
-          <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 3L2 9l10 6 10-6-10-6zM2 15l10 6 10-6M2 12l10 6 10-6"/>
-          </svg>
-          <span>UNPHU <span class="font-light">Eventos</span></span>
+        <a href="{% url 'home' %}" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+          <img src="{% static 'unphu-logo-letras_no-bg.png' %}" alt="UNPHU" class="h-8 brightness-0 invert" />
+          <span class="text-white font-light text-base tracking-wide hidden sm:block">Eventos</span>
         </a>
 
-        <!-- Links -->
+        <!-- Links escritorio -->
         <div class="hidden md:flex items-center gap-6 text-sm font-medium">
           <a href="{% url 'home' %}" class="hover:text-unphu-gold transition-colors">Inicio</a>
           <a href="{% url 'tesis_lista' %}" class="hover:text-unphu-gold transition-colors">Presentaciones de Tesis</a>
@@ -51,9 +47,19 @@
               <a href="{% url 'admin_panel' %}" class="bg-unphu-gold text-unphu-dark px-3 py-1 rounded-full font-semibold hover:bg-yellow-400 transition-colors">
                 Gestión
               </a>
-              <span class="text-unphu-gold text-xs">{{ user.get_full_name|default:user.username }}</span>
+              <div class="relative group">
+                <button class="flex items-center gap-1 text-unphu-gold hover:text-yellow-300 transition-colors text-sm">
+                  {{ user.get_full_name|default:user.username }}
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="absolute right-0 mt-1 w-48 bg-white text-gray-800 rounded-lg shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                  <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Cerrar sesión</button>
+                  </form>
+                </div>
+              </div>
             {% else %}
-              <!-- Dropdown perfil -->
               <div class="relative group">
                 <button class="flex items-center gap-1 hover:text-unphu-gold transition-colors">
                   <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A8 8 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -77,7 +83,7 @@
           {% endif %}
         </div>
 
-        <!-- Menú móvil (hamburger) -->
+        <!-- Menú móvil -->
         <div class="md:hidden">
           <details class="group">
             <summary class="list-none cursor-pointer p-2">
@@ -89,6 +95,7 @@
               {% if user.is_authenticated %}
                 {% if user.rol == 'ADMIN' %}
                   <a href="{% url 'admin_panel' %}" class="text-unphu-gold">Gestión</a>
+                  <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text-red-400 text-left">Cerrar sesión</button></form>
                 {% else %}
                   <a href="{% url 'perfil' %}" class="hover:text-unphu-gold">Mi perfil</a>
                   <a href="{% url 'configuracion_notificaciones' %}" class="hover:text-unphu-gold">Notificaciones</a>
@@ -136,10 +143,18 @@
   <!-- Footer -->
   <footer class="bg-unphu-dark text-white mt-12 py-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-green-200">
-        <div class="font-semibold text-white">Universidad Nacional Pedro Henríquez Ureña</div>
-        <div class="text-center">Sistema de Manejo de Eventos y Avisos Académicos</div>
-        <div class="text-green-300">Facultad de Ciencias y Tecnología</div>
+      <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div class="flex items-center gap-4">
+          <img src="{% static 'unphu-logo-completo_no-bg.png' %}" alt="UNPHU" class="h-12 brightness-0 invert opacity-80" />
+        </div>
+        <div class="text-center text-sm text-green-200">
+          <p class="font-semibold text-white">Sistema de Manejo de Eventos y Avisos Académicos</p>
+          <p class="mt-1">Facultad de Ciencias y Tecnología · Escuela de Informática</p>
+        </div>
+        <div class="text-xs text-green-400 text-right">
+          <p>Universidad Nacional</p>
+          <p>Pedro Henríquez Ureña</p>
+        </div>
       </div>
     </div>
   </footer>

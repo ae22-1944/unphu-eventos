@@ -1,12 +1,16 @@
 {% extends "sistema/base.html" %}
+{% load static %}
 
 {% block title %}Presentaciones de Tesis — UNPHU{% endblock %}
 
 {% block content %}
 
-<!-- Hero -->
-<div class="bg-gradient-to-r from-purple-700 to-purple-900 text-white py-10 px-4">
-  <div class="max-w-5xl mx-auto">
+<!-- Hero con imagen de la biblioteca -->
+<div class="relative text-white overflow-hidden" style="min-height: 180px;">
+  <img src="{% static 'unphu-2020-biblioteca.webp' %}" alt="Biblioteca UNPHU"
+    class="absolute inset-0 w-full h-full object-cover object-center" />
+  <div class="absolute inset-0 bg-purple-900 bg-opacity-80"></div>
+  <div class="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
     <h1 class="text-3xl md:text-4xl font-bold mb-2">Presentaciones de Tesis</h1>
     <p class="text-purple-200 text-lg">Calendario de defensas de grado de la UNPHU</p>
   </div>
@@ -56,12 +60,14 @@
             </td>
             <td class="px-4 py-3 text-gray-600 whitespace-nowrap">
               <div>{{ tesis.fecha_evento|date:"d/m/Y" }}</div>
-              <div class="text-xs text-gray-400">{{ tesis.fecha_evento|time:"g:i A" }}</div>
+              <div class="text-xs text-gray-400">
+                {{ tesis.fecha_evento|time:"g:i A" }}{% if tesis.fecha_fin %} – {{ tesis.fecha_fin|time:"g:i A" }}{% endif %}
+              </div>
             </td>
             <td class="px-4 py-3 text-gray-600">{{ tesis.lugar }}</td>
             <td class="px-4 py-3 text-gray-600 text-xs">
               <div>{{ tesis.escuela.nombre }}</div>
-              <div class="text-gray-400">{{ tesis.escuela.facultad.nombre }}</div>
+              {% if tesis.escuela.facultad %}<div class="text-gray-400">{{ tesis.escuela.facultad.nombre }}</div>{% endif %}
             </td>
             <td class="px-4 py-3 text-center">
               {% if tesis.cupo_maximo == 0 %}

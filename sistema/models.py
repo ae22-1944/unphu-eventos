@@ -19,16 +19,23 @@ class Facultad(models.Model):
 class Escuela(models.Model):
     nombre = models.CharField(max_length=100)
     facultad = models.ForeignKey(
-        Facultad, on_delete=models.CASCADE, related_name="escuelas"
+        Facultad,
+        on_delete=models.SET_NULL,
+        related_name="escuelas",
+        null=True,
+        blank=True,
+        help_text="Opcional — dejar vacío si la escuela no pertenece a una facultad separada",
     )
 
     class Meta:
         verbose_name = "Escuela"
         verbose_name_plural = "Escuelas"
-        ordering = ["facultad__nombre", "nombre"]
+        ordering = ["nombre"]
 
     def __str__(self):
-        return f"{self.nombre} — {self.facultad.nombre}"
+        if self.facultad:
+            return f"{self.nombre} — {self.facultad.nombre}"
+        return self.nombre
 
 
 class Usuario(AbstractUser):
@@ -111,7 +118,13 @@ class Evento(models.Model):
         verbose_name="Cupo máximo",
         help_text="0 = sin límite de cupos",
     )
-    fecha_evento = models.DateTimeField(verbose_name="Fecha y hora del evento")
+    fecha_evento = models.DateTimeField(verbose_name="Fecha y hora de inicio")
+    fecha_fin = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Fecha y hora de finalización",
+        help_text="Opcional — si el evento tiene duración definida",
+    )
     escuela = models.ForeignKey(
         Escuela, on_delete=models.CASCADE, verbose_name="Escuela"
     )
