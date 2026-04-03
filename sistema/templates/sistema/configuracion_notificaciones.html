@@ -1,0 +1,106 @@
+{% extends "sistema/base.html" %}
+
+{% block title %}Configuración de notificaciones — UNPHU Eventos{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Breadcrumb -->
+  <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2">
+    <a href="{% url 'perfil' %}" class="hover:text-unphu transition-colors">Mi perfil</a>
+    <span>›</span>
+    <span class="text-gray-700 font-medium">Notificaciones</span>
+  </nav>
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-2">Preferencias de notificaciones</h1>
+  <p class="text-gray-500 text-sm mb-8">Controla cómo y cuándo recibes correos electrónicos de UNPHU Eventos.</p>
+
+  <form method="post" action="{% url 'configuracion_notificaciones' %}">
+    {% csrf_token %}
+
+    <div class="space-y-4">
+
+      <!-- Confirmación de inscripción -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 flex items-start justify-between gap-4">
+        <div>
+          <div class="font-medium text-gray-800 text-sm">Confirmación de inscripción</div>
+          <div class="text-gray-500 text-xs mt-0.5">Recibe un correo cuando te inscribas exitosamente en un evento.</div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+          <input type="checkbox" name="confirmacion_inscripcion" class="sr-only peer"
+            {% if form.confirmacion_inscripcion.value %}checked{% endif %} />
+          <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-unphu rounded-full peer peer-checked:bg-unphu peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+        </label>
+      </div>
+
+      <!-- Recordatorio antes del evento -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5">
+        <div class="flex items-start justify-between gap-4 mb-4">
+          <div>
+            <div class="font-medium text-gray-800 text-sm">Recordatorio antes del evento</div>
+            <div class="text-gray-500 text-xs mt-0.5">Recibe un recordatorio por correo antes de los eventos en los que estás inscrito.</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+            <input type="checkbox" name="recordatorio_evento" id="id_recordatorio_toggle" class="sr-only peer"
+              {% if form.recordatorio_evento.value %}checked{% endif %}
+              onchange="document.getElementById('dias_config').classList.toggle('hidden', !this.checked)" />
+            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-unphu rounded-full peer peer-checked:bg-unphu peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+          </label>
+        </div>
+
+        <div id="dias_config" class="{% if not form.recordatorio_evento.value %}hidden{% endif %} border-t border-gray-100 pt-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Días de anticipación</label>
+          <div class="flex items-center gap-3">
+            <input type="number" name="dias_recordatorio" min="1" max="30"
+              value="{{ form.dias_recordatorio.value|default:1 }}"
+              class="w-24 border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-unphu" />
+            <span class="text-sm text-gray-500">día(s) antes del evento</span>
+          </div>
+          {% if form.dias_recordatorio.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ form.dias_recordatorio.errors.0 }}</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Nuevos eventos -->
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-5 space-y-4">
+        <p class="font-medium text-gray-800 text-sm mb-1">Notificaciones de nuevos eventos</p>
+
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <div class="text-sm text-gray-700">Nuevos eventos en mi escuela</div>
+            <div class="text-gray-500 text-xs mt-0.5">Recibe un correo cuando se publique un evento de tu escuela.</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+            <input type="checkbox" name="notificar_nueva_actividad_escuela" class="sr-only peer"
+              {% if form.notificar_nueva_actividad_escuela.value %}checked{% endif %} />
+            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-unphu rounded-full peer peer-checked:bg-unphu peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+          </label>
+        </div>
+
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <div class="text-sm text-gray-700">Nuevos eventos en mi facultad</div>
+            <div class="text-gray-500 text-xs mt-0.5">Recibe un correo de eventos de otras escuelas de tu facultad.</div>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer flex-shrink-0">
+            <input type="checkbox" name="notificar_nueva_actividad_facultad" class="sr-only peer"
+              {% if form.notificar_nueva_actividad_facultad.value %}checked{% endif %} />
+            <div class="w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-unphu rounded-full peer peer-checked:bg-unphu peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+          </label>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="mt-6 flex items-center gap-3">
+      <button type="submit"
+        class="bg-unphu hover:bg-unphu-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm">
+        Guardar preferencias
+      </button>
+      <a href="{% url 'perfil' %}" class="text-sm text-gray-500 hover:text-gray-700 transition-colors">Cancelar</a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

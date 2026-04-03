@@ -1,14 +1,12 @@
 from django.contrib import admin
-from django.urls import path
-from sistema import views
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    path("", views.home, name="home"),
-    path("evento/<int:evento_id>/", views.detalle_evento, name="detalle_evento"),
-    path(
-        "evento/<int:evento_id>/inscribir/",
-        views.inscribir_evento,
-        name="inscribir_evento",
-    ),
+    path("", include("sistema.urls")),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

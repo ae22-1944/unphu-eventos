@@ -1,0 +1,57 @@
+{% extends "sistema/base.html" %}
+
+{% block title %}Eliminar evento — UNPHU Eventos{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto px-4 sm:px-6 lg:px-8 py-16">
+  <div class="bg-white rounded-2xl border border-red-200 shadow-sm overflow-hidden">
+
+    <div class="bg-red-50 px-6 py-5 border-b border-red-100 flex items-center gap-3">
+      <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+        <svg class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      </div>
+      <div>
+        <h1 class="font-bold text-red-800 text-lg">Eliminar evento</h1>
+        <p class="text-red-600 text-sm">Esta acción no se puede deshacer</p>
+      </div>
+    </div>
+
+    <div class="px-6 py-5">
+      <p class="text-gray-700 text-sm mb-4">
+        ¿Estás seguro de que deseas eliminar el siguiente evento? Se eliminarán también todas las inscripciones asociadas.
+      </p>
+
+      <div class="bg-gray-50 rounded-lg p-4 mb-5 border border-gray-200">
+        <p class="font-semibold text-gray-900">{{ evento.titulo }}</p>
+        <p class="text-sm text-gray-500 mt-1">
+          {{ evento.get_tipo_display }} ·
+          {{ evento.fecha_evento|date:"d/m/Y" }} ·
+          {{ evento.escuela.nombre }}
+        </p>
+        {% with inscritos=evento.inscripcion_set.count %}
+          {% if inscritos %}
+            <p class="text-xs text-red-500 mt-2 font-medium">
+              ⚠ {{ inscritos }} estudiante{{ inscritos|pluralize }} inscrito{{ inscritos|pluralize }} perderá{{ inscritos|pluralize:"n," }} su inscripción
+            </p>
+          {% endif %}
+        {% endwith %}
+      </div>
+
+      <div class="flex gap-3">
+        <form method="post" action="{% url 'admin_evento_eliminar' pk=evento.pk %}">
+          {% csrf_token %}
+          <button type="submit"
+            class="bg-red-600 hover:bg-red-700 text-white font-semibold px-5 py-2.5 rounded-lg transition-colors text-sm">
+            Sí, eliminar
+          </button>
+        </form>
+        <a href="{% url 'admin_panel' %}"
+          class="border border-gray-300 text-gray-600 hover:bg-gray-50 font-medium px-5 py-2.5 rounded-lg transition-colors text-sm">
+          Cancelar
+        </a>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}

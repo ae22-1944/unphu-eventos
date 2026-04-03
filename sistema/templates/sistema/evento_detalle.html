@@ -1,0 +1,197 @@
+{% extends "sistema/base.html" %}
+
+{% block title %}{{ evento.titulo }} — UNPHU Eventos{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Breadcrumb -->
+  <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2">
+    <a href="{% url 'home' %}" class="hover:text-unphu transition-colors">Inicio</a>
+    <span>›</span>
+    {% if evento.tipo == 'TESIS' %}
+      <a href="{% url 'tesis_lista' %}" class="hover:text-unphu transition-colors">Presentaciones de Tesis</a>
+      <span>›</span>
+    {% endif %}
+    <span class="text-gray-700 font-medium">{{ evento.titulo|truncatechars:40 }}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- Contenido principal -->
+    <div class="lg:col-span-2">
+
+      <!-- Imagen o banner -->
+      {% if evento.imagen %}
+        <img src="{{ evento.imagen.url }}" alt="{{ evento.titulo }}" class="w-full rounded-xl mb-6 object-cover max-h-72" />
+      {% else %}
+        <div class="w-full rounded-xl mb-6 h-48 flex items-center justify-center
+          {% if evento.tipo == 'TESIS' %}bg-gradient-to-r from-purple-600 to-purple-800
+          {% elif evento.tipo == 'ACADEMICA' %}bg-gradient-to-r from-blue-600 to-blue-800
+          {% else %}bg-gradient-to-r from-unphu to-unphu-dark{% endif %}">
+          <span class="text-white text-opacity-80 text-5xl font-bold opacity-30">UNPHU</span>
+        </div>
+      {% endif %}
+
+      <!-- Tipo badge -->
+      <span class="inline-block text-sm font-semibold px-3 py-1 rounded-full mb-3
+        {% if evento.tipo == 'TESIS' %}bg-purple-100 text-purple-700
+        {% elif evento.tipo == 'ACADEMICA' %}bg-blue-100 text-blue-700
+        {% else %}bg-green-100 text-green-700{% endif %}">
+        {{ evento.get_tipo_display }}
+      </span>
+
+      <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-4">{{ evento.titulo }}</h1>
+
+      <div class="prose prose-sm max-w-none text-gray-700 leading-relaxed">
+        {{ evento.descripcion|linebreaks }}
+      </div>
+
+      {% if evento.publicado_por %}
+        <p class="mt-6 text-xs text-gray-400">
+          Publicado por <span class="font-medium text-gray-500">{{ evento.publicado_por.get_full_name|default:evento.publicado_por.username }}</span>
+          el {{ evento.fecha_creacion|date:"d/m/Y" }}
+          {% if evento.fecha_modificacion != evento.fecha_creacion %}
+            · Actualizado el {{ evento.fecha_modificacion|date:"d/m/Y" }}
+          {% endif %}
+        </p>
+      {% endif %}
+
+    </div>
+
+    <!-- Tarjeta de info y acción -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sticky top-24">
+
+        <h2 class="font-semibold text-gray-800 mb-4 text-lg">Información del evento</h2>
+
+        <dl class="space-y-3 text-sm">
+          <div class="flex items-start gap-3">
+            <dt class="flex-shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-unphu" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            </dt>
+            <dd>
+              <span class="block font-medium text-gray-700">{{ evento.fecha_evento|date:"l d \d\e F \d\e Y" }}</span>
+              <span class="text-gray-500">{{ evento.fecha_evento|time:"g:i A" }}</span>
+            </dd>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <dt class="flex-shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-unphu" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </dt>
+            <dd class="text-gray-700">{{ evento.lugar }}</dd>
+          </div>
+
+          <div class="flex items-start gap-3">
+            <dt class="flex-shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-unphu" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5"/></svg>
+            </dt>
+            <dd>
+              <span class="block text-gray-700">{{ evento.escuela.nombre }}</span>
+              <span class="text-gray-500 text-xs">{{ evento.escuela.facultad.nombre }}</span>
+            </dd>
+          </div>
+
+          <!-- Cupos -->
+          <div class="flex items-start gap-3">
+            <dt class="flex-shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-unphu" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+            </dt>
+            <dd>
+              {% if evento.cupo_maximo == 0 %}
+                <span class="text-gray-700">Sin límite de cupos</span>
+                <span class="block text-xs text-gray-400">{{ inscritos }} inscrito{{ inscritos|pluralize }}</span>
+              {% else %}
+                <span class="block text-gray-700 font-medium">
+                  {% if cupos_disponibles == 0 %}
+                    <span class="text-red-600">Sin cupos disponibles</span>
+                  {% elif cupos_disponibles <= 5 %}
+                    <span class="text-yellow-600">{{ cupos_disponibles }} cupo{{ cupos_disponibles|pluralize }} disponible{{ cupos_disponibles|pluralize }}</span>
+                  {% else %}
+                    <span class="text-green-600">{{ cupos_disponibles }} cupos disponibles</span>
+                  {% endif %}
+                </span>
+                <span class="text-xs text-gray-400">{{ inscritos }} de {{ evento.cupo_maximo }} inscritos</span>
+                <!-- Barra de progreso -->
+                <div class="mt-1.5 w-full bg-gray-200 rounded-full h-1.5">
+                  {% widthratio inscritos evento.cupo_maximo 100 as pct %}
+                  <div class="h-1.5 rounded-full {% if cupos_disponibles == 0 %}bg-red-500{% elif cupos_disponibles <= 5 %}bg-yellow-400{% else %}bg-green-500{% endif %}"
+                    style="width: {{ pct }}%"></div>
+                </div>
+              {% endif %}
+            </dd>
+          </div>
+        </dl>
+
+        <hr class="my-5 border-gray-200" />
+
+        <!-- Acción -->
+        {% if not user.is_authenticated %}
+          <a href="{% url 'login' %}?next={{ request.path }}"
+            class="block text-center bg-unphu hover:bg-unphu-dark text-white font-semibold py-3 rounded-lg transition-colors text-sm">
+            Inicia sesión para inscribirte
+          </a>
+
+        {% elif ya_inscrito %}
+          <div class="flex items-center gap-2 justify-center bg-green-50 border border-green-200 text-green-700 rounded-lg py-3 px-4 mb-3 text-sm font-medium">
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            Inscrito en este evento
+          </div>
+          <form method="post" action="{% url 'cancelar_inscripcion' pk=evento.pk %}">
+            {% csrf_token %}
+            <button type="submit"
+              onclick="return confirm('¿Estás seguro de que deseas cancelar tu inscripción?')"
+              class="w-full border border-red-300 text-red-600 hover:bg-red-50 font-medium py-2 rounded-lg transition-colors text-sm">
+              Cancelar inscripción
+            </button>
+          </form>
+
+        {% elif puede_inscribirse %}
+          <form method="post" action="{% url 'inscribir_evento' pk=evento.pk %}">
+            {% csrf_token %}
+            <button type="submit"
+              class="w-full bg-unphu hover:bg-unphu-dark text-white font-semibold py-3 rounded-lg transition-colors text-sm">
+              Inscribirme
+            </button>
+          </form>
+
+        {% else %}
+          <button disabled
+            class="w-full bg-gray-200 text-gray-400 font-semibold py-3 rounded-lg cursor-not-allowed text-sm">
+            Sin cupos disponibles
+          </button>
+        {% endif %}
+
+        <!-- Semestre relevante -->
+        {% if evento.semestre_min or evento.semestre_max %}
+          <p class="mt-4 text-xs text-center text-gray-400">
+            Dirigido a estudiantes de semestre
+            {% if evento.semestre_min and evento.semestre_max %}
+              {{ evento.semestre_min }}–{{ evento.semestre_max }}
+            {% elif evento.semestre_min %}
+              {{ evento.semestre_min }} en adelante
+            {% else %}
+              hasta {{ evento.semestre_max }}
+            {% endif %}
+          </p>
+        {% endif %}
+
+        {% if user.is_authenticated and user.rol == 'ADMIN' %}
+          <div class="mt-4 pt-4 border-t border-gray-100 flex gap-2">
+            <a href="{% url 'admin_evento_editar' pk=evento.pk %}"
+              class="flex-1 text-center text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg transition-colors font-medium">
+              Editar
+            </a>
+            <a href="{% url 'admin_evento_eliminar' pk=evento.pk %}"
+              class="flex-1 text-center text-sm bg-red-50 hover:bg-red-100 text-red-600 py-2 rounded-lg transition-colors font-medium">
+              Eliminar
+            </a>
+          </div>
+        {% endif %}
+
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,19 @@
+Hola,
+
+Se ha publicado un nuevo evento en tu área académica:
+
+  Evento:  {{ evento.titulo }}
+  Tipo:    {{ evento.get_tipo_display }}
+  Fecha:   {{ evento.fecha_evento|date:"l d \d\e F \d\e Y \a \l\a\s g:i A" }}
+  Lugar:   {{ evento.lugar }}
+  Escuela: {{ evento.escuela.nombre }}
+
+Visita el portal para ver más detalles e inscribirte:
+http://127.0.0.1:8000/evento/{{ evento.pk }}/
+
+Puedes administrar tus preferencias de notificación desde tu perfil.
+
+---
+Universidad Nacional Pedro Henríquez Ureña
+Sistema de Manejo de Eventos y Avisos Académicos
+Este correo fue enviado automáticamente, por favor no responder.

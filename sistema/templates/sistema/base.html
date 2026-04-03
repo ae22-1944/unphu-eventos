@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}UNPHU Eventos{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            unphu: {
+              DEFAULT: '#006633',
+              dark:    '#004d26',
+              light:   '#008040',
+              gold:    '#F5A623',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <nav class="bg-unphu text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+
+        <!-- Logo -->
+        <a href="{% url 'home' %}" class="flex items-center gap-2 font-bold text-lg hover:text-unphu-gold transition-colors">
+          <svg class="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 3L2 9l10 6 10-6-10-6zM2 15l10 6 10-6M2 12l10 6 10-6"/>
+          </svg>
+          <span>UNPHU <span class="font-light">Eventos</span></span>
+        </a>
+
+        <!-- Links -->
+        <div class="hidden md:flex items-center gap-6 text-sm font-medium">
+          <a href="{% url 'home' %}" class="hover:text-unphu-gold transition-colors">Inicio</a>
+          <a href="{% url 'tesis_lista' %}" class="hover:text-unphu-gold transition-colors">Presentaciones de Tesis</a>
+
+          {% if user.is_authenticated %}
+            {% if user.rol == 'ADMIN' %}
+              <a href="{% url 'admin_panel' %}" class="bg-unphu-gold text-unphu-dark px-3 py-1 rounded-full font-semibold hover:bg-yellow-400 transition-colors">
+                Gestión
+              </a>
+              <span class="text-unphu-gold text-xs">{{ user.get_full_name|default:user.username }}</span>
+            {% else %}
+              <!-- Dropdown perfil -->
+              <div class="relative group">
+                <button class="flex items-center gap-1 hover:text-unphu-gold transition-colors">
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A8 8 0 1118.88 6.196M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                  {{ user.first_name|default:user.username }}
+                  <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+                <div class="absolute right-0 mt-1 w-48 bg-white text-gray-800 rounded-lg shadow-lg py-1 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-150 z-50">
+                  <a href="{% url 'perfil' %}" class="block px-4 py-2 text-sm hover:bg-gray-100">Mi perfil</a>
+                  <a href="{% url 'configuracion_notificaciones' %}" class="block px-4 py-2 text-sm hover:bg-gray-100">Notificaciones</a>
+                  <hr class="my-1" />
+                  <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">Cerrar sesión</button>
+                  </form>
+                </div>
+              </div>
+            {% endif %}
+          {% else %}
+            <a href="{% url 'login' %}" class="hover:text-unphu-gold transition-colors">Iniciar sesión</a>
+            <a href="{% url 'registro' %}" class="bg-white text-unphu px-3 py-1 rounded-full font-semibold hover:bg-unphu-gold hover:text-unphu-dark transition-colors">Registrarse</a>
+          {% endif %}
+        </div>
+
+        <!-- Menú móvil (hamburger) -->
+        <div class="md:hidden">
+          <details class="group">
+            <summary class="list-none cursor-pointer p-2">
+              <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </summary>
+            <div class="absolute right-4 top-16 bg-unphu-dark rounded-lg shadow-xl p-4 w-56 flex flex-col gap-3 text-sm font-medium">
+              <a href="{% url 'home' %}" class="hover:text-unphu-gold">Inicio</a>
+              <a href="{% url 'tesis_lista' %}" class="hover:text-unphu-gold">Presentaciones de Tesis</a>
+              {% if user.is_authenticated %}
+                {% if user.rol == 'ADMIN' %}
+                  <a href="{% url 'admin_panel' %}" class="text-unphu-gold">Gestión</a>
+                {% else %}
+                  <a href="{% url 'perfil' %}" class="hover:text-unphu-gold">Mi perfil</a>
+                  <a href="{% url 'configuracion_notificaciones' %}" class="hover:text-unphu-gold">Notificaciones</a>
+                {% endif %}
+                <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="text-red-400 text-left">Cerrar sesión</button></form>
+              {% else %}
+                <a href="{% url 'login' %}" class="hover:text-unphu-gold">Iniciar sesión</a>
+                <a href="{% url 'registro' %}" class="text-unphu-gold">Registrarse</a>
+              {% endif %}
+            </div>
+          </details>
+        </div>
+
+      </div>
+    </div>
+  </nav>
+
+  <!-- Mensajes Django -->
+  {% if messages %}
+  <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-4 space-y-2">
+    {% for message in messages %}
+      <div class="flex items-start gap-3 px-4 py-3 rounded-lg text-sm font-medium
+        {% if message.tags == 'success' %}bg-green-100 text-green-800 border border-green-200
+        {% elif message.tags == 'error' %}bg-red-100 text-red-800 border border-red-200
+        {% elif message.tags == 'warning' %}bg-yellow-100 text-yellow-800 border border-yellow-200
+        {% else %}bg-blue-100 text-blue-800 border border-blue-200{% endif %}">
+        {% if message.tags == 'success' %}
+          <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        {% elif message.tags == 'error' %}
+          <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        {% else %}
+          <svg class="w-5 h-5 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        {% endif %}
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- Contenido principal -->
+  <main class="flex-1">
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-unphu-dark text-white mt-12 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-green-200">
+        <div class="font-semibold text-white">Universidad Nacional Pedro Henríquez Ureña</div>
+        <div class="text-center">Sistema de Manejo de Eventos y Avisos Académicos</div>
+        <div class="text-green-300">Facultad de Ciencias y Tecnología</div>
+      </div>
+    </div>
+  </footer>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

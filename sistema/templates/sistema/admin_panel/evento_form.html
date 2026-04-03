@@ -1,0 +1,166 @@
+{% extends "sistema/base.html" %}
+
+{% block title %}{{ accion }} — UNPHU Eventos{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+  <!-- Breadcrumb -->
+  <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2">
+    <a href="{% url 'admin_panel' %}" class="hover:text-unphu transition-colors">Gestión</a>
+    <span>›</span>
+    <span class="text-gray-700 font-medium">{{ accion }}</span>
+  </nav>
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-6">{{ accion }}</h1>
+
+  {% if evento %}
+    <div class="bg-blue-50 border border-blue-200 rounded-lg px-4 py-3 mb-6 text-sm text-blue-700 flex items-start gap-2">
+      <svg class="w-4 h-4 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span>
+        Publicado originalmente por
+        <strong>{{ evento.publicado_por.get_full_name|default:evento.publicado_por.username|default:"(desconocido)" }}</strong>
+        el {{ evento.fecha_creacion|date:"d/m/Y \a \l\a\s g:i A" }}.
+        El autor original se mantiene para fines de auditoría.
+      </span>
+    </div>
+  {% endif %}
+
+  <form method="post" action="" enctype="multipart/form-data" class="space-y-6">
+    {% csrf_token %}
+
+    <!-- Información básica -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <h2 class="font-semibold text-gray-700 text-sm uppercase tracking-wide mb-4">Información básica</h2>
+      <div class="space-y-4">
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.titulo.label }} <span class="text-red-500">*</span></label>
+          <input type="text" name="titulo" value="{{ form.titulo.value|default:'' }}"
+            class="w-full border {% if form.titulo.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu"
+            placeholder="Título del evento" />
+          {% if form.titulo.errors %}<p class="text-red-500 text-xs mt-1">{{ form.titulo.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.tipo.label }} <span class="text-red-500">*</span></label>
+          <select name="tipo"
+            class="w-full border {% if form.tipo.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu">
+            <option value="">-- Selecciona un tipo --</option>
+            {% for val, label in form.fields.tipo.choices %}
+              {% if val %}
+                <option value="{{ val }}" {% if form.tipo.value == val %}selected{% endif %}>{{ label }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+          {% if form.tipo.errors %}<p class="text-red-500 text-xs mt-1">{{ form.tipo.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.descripcion.label }} <span class="text-red-500">*</span></label>
+          <textarea name="descripcion" rows="5"
+            class="w-full border {% if form.descripcion.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu resize-y"
+            placeholder="Descripción detallada del evento...">{{ form.descripcion.value|default:'' }}</textarea>
+          {% if form.descripcion.errors %}<p class="text-red-500 text-xs mt-1">{{ form.descripcion.errors.0 }}</p>{% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Fecha y lugar -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <h2 class="font-semibold text-gray-700 text-sm uppercase tracking-wide mb-4">Fecha y lugar</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.fecha_evento.label }} <span class="text-red-500">*</span></label>
+          <input type="datetime-local" name="fecha_evento"
+            value="{{ form.fecha_evento.value|default:'' }}"
+            class="w-full border {% if form.fecha_evento.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu" />
+          {% if form.fecha_evento.errors %}<p class="text-red-500 text-xs mt-1">{{ form.fecha_evento.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.lugar.label }} <span class="text-red-500">*</span></label>
+          <input type="text" name="lugar" value="{{ form.lugar.value|default:'' }}"
+            class="w-full border {% if form.lugar.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu"
+            placeholder="Ej. Edificio B, Aula 205" />
+          {% if form.lugar.errors %}<p class="text-red-500 text-xs mt-1">{{ form.lugar.errors.0 }}</p>{% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Alcance académico -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <h2 class="font-semibold text-gray-700 text-sm uppercase tracking-wide mb-4">Alcance académico</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+        <div class="md:col-span-3">
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.escuela.label }} <span class="text-red-500">*</span></label>
+          <select name="escuela"
+            class="w-full border {% if form.escuela.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu">
+            <option value="">-- Selecciona una escuela --</option>
+            {% for opt in form.escuela %}{{ opt }}{% endfor %}
+          </select>
+          {% if form.escuela.errors %}<p class="text-red-500 text-xs mt-1">{{ form.escuela.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.semestre_min.label }}</label>
+          <input type="number" name="semestre_min" min="1" max="10"
+            value="{{ form.semestre_min.value|default:'' }}"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu"
+            placeholder="1" />
+          {% if form.semestre_min.errors %}<p class="text-red-500 text-xs mt-1">{{ form.semestre_min.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.semestre_max.label }}</label>
+          <input type="number" name="semestre_max" min="1" max="10"
+            value="{{ form.semestre_max.value|default:'' }}"
+            class="w-full border {% if form.semestre_max.errors %}border-red-400{% else %}border-gray-300{% endif %} rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu"
+            placeholder="10" />
+          {% if form.semestre_max.errors %}<p class="text-red-500 text-xs mt-1">{{ form.semestre_max.errors.0 }}</p>{% endif %}
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">{{ form.cupo_maximo.label }}</label>
+          <input type="number" name="cupo_maximo" min="0"
+            value="{{ form.cupo_maximo.value|default:0 }}"
+            class="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-unphu" />
+          <p class="text-gray-400 text-xs mt-1">0 = sin límite de cupos</p>
+          {% if form.cupo_maximo.errors %}<p class="text-red-500 text-xs mt-1">{{ form.cupo_maximo.errors.0 }}</p>{% endif %}
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Imagen -->
+    <div class="bg-white rounded-xl border border-gray-200 shadow-sm p-6">
+      <h2 class="font-semibold text-gray-700 text-sm uppercase tracking-wide mb-4">Imagen del evento (opcional)</h2>
+      {% if evento.imagen %}
+        <div class="mb-3">
+          <img src="{{ evento.imagen.url }}" alt="Imagen actual" class="h-32 rounded-lg object-cover" />
+          <p class="text-xs text-gray-500 mt-1">Imagen actual. Sube una nueva para reemplazarla.</p>
+        </div>
+      {% endif %}
+      <input type="file" name="imagen" accept="image/*"
+        class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-unphu file:text-white hover:file:bg-unphu-dark cursor-pointer" />
+    </div>
+
+    <!-- Botones -->
+    <div class="flex items-center gap-3">
+      <button type="submit"
+        class="bg-unphu hover:bg-unphu-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm">
+        {{ accion }}
+      </button>
+      <a href="{% url 'admin_panel' %}"
+        class="border border-gray-300 text-gray-600 hover:bg-gray-50 font-medium px-5 py-2.5 rounded-lg transition-colors text-sm">
+        Cancelar
+      </a>
+    </div>
+
+  </form>
+</div>
+{% endblock %}

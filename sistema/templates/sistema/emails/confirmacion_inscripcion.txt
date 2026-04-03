@@ -1,0 +1,19 @@
+Hola {{ usuario.first_name|default:usuario.username }},
+
+Tu inscripción al siguiente evento ha sido confirmada exitosamente:
+
+  Evento:  {{ evento.titulo }}
+  Tipo:    {{ evento.get_tipo_display }}
+  Fecha:   {{ evento.fecha_evento|date:"l d \d\e F \d\e Y \a \l\a\s g:i A" }}
+  Lugar:   {{ evento.lugar }}
+  Escuela: {{ evento.escuela.nombre }}
+
+Recuerda llegar con anticipación. Si no puedes asistir, por favor cancela tu
+inscripción desde el portal para liberar el cupo a otros estudiantes.
+
+Portal: http://127.0.0.1:8000/
+
+---
+Universidad Nacional Pedro Henríquez Ureña
+Sistema de Manejo de Eventos y Avisos Académicos
+Este correo fue enviado automáticamente, por favor no responder.
